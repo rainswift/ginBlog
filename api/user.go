@@ -5,6 +5,7 @@ import (
 	"ginBlog/dao"
 	"ginBlog/models"
 	response "ginBlog/responose"
+	"ginBlog/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -21,14 +22,14 @@ func AddUser(c *gin.Context) {
 		response.Failed("参数错误", c)
 		return
 	}
+
 	if err := AddUser2(user.Username); err != nil {
 		response.Failed("用户名已经存在", c)
 		return
 	}
 	b, _ := GenPwd(user.Password)
 	user.Password = string(b)
-	fmt.Printf("输入的名字 % + v\n", user.Username)
-	fmt.Println(c)
+
 	dao.Mgr.AddUser(&user)
 	response.Success("添加成功", user, c)
 }
@@ -54,6 +55,46 @@ func AddUser2(name string) error {
 	//}
 	// 创建用户
 	//c.AddUser(&user)
+}
+
+func GetUserList(c *gin.Context) {
+	fmt.Printf("列表数据： % + v\n", c)
+	pagination := utils.GeneratePaginationFromRequest(c)
+	users := dao.Mgr.GetUserList(&pagination)
+	response.Success("查询成功", users, c)
+}
+
+func UserDelect(c *gin.Context) {
+	pagination := utils.RequestId(c)
+	//bodyByts, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("删除数据： % + v\n", pagination)
+	id := c.DefaultPostForm("id", "0")
+	//id := c.PostForm("id")
+
+	fmt.Printf("删除id： % + v\n", id)
+	users := dao.Mgr.UserDelete(pagination)
+	response.Success("删除成功", users, c)
+}
+
+//登录
+func Login(c *gin.Context) {
+
+	var user models.BlogUser
+
+	if err := c.ShouldBind(&user); err != nil {
+		response.Failed("参数错误", c)
+		return
+	}
+
+	if err := AddUser2(user.Username); err != nil {
+		response.Failed("用户名已经存在", c)
+		return
+	}
+	b, _ := GenPwd(user.Password)
+	user.Password = string(b)
+
+	dao.Mgr.AddUser(&user)
+	response.Success("添加成功", user, c)
 }
 
 // 生成密码

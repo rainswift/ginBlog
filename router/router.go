@@ -31,6 +31,9 @@ func Start() {
 
 	e.Use(mwCORS)
 	e.POST("/add", api.AddUser)
+	e.POST("/userDelect", api.UserDelect)
+	e.GET("/userList", api.GetUserList)
+	e.POST("/login", api.Login)
 
 	e.Run()
 }
