@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"fmt"
 	"ginBlog/models"
 	"log"
 
@@ -13,9 +12,9 @@ type Manager interface {
 	AddUser(user *models.BlogUser)
 	GetByName(name string) bool
 	GetLoadUser(name string) (*models.BlogUser, bool)
-	Cs_text()
 	GetUserList(page *models.Pagination) []models.BlogUser
 	UserDelete(id int) models.BlogUser
+	SaveEdit(c *models.Content)
 }
 
 type manager struct {
@@ -32,12 +31,17 @@ func init() {
 	}
 	Mgr = &manager{db: db}
 	db.AutoMigrate(&models.BlogUser{})
+	db.AutoMigrate(&models.Content{})
 }
 
 // 创建用户
 func (mgr *manager) AddUser(user *models.BlogUser) {
 	mgr.db.Create(user)
+}
 
+// 保持文章
+func (mgr *manager) SaveEdit(c *models.Content) {
+	mgr.db.Create(c)
 }
 
 // 根据用户名查询用户是否存在

@@ -5,6 +5,7 @@ import (
 	"ginBlog/dao"
 	"ginBlog/models"
 	response "ginBlog/responose"
+	"ginBlog/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -27,8 +28,7 @@ func AddUser(c *gin.Context) {
 	}
 	b, _ := GenPwd(user.Password)
 	user.Password = string(b)
-	fmt.Printf("输入的名字 % + v\n", user.Username)
-	fmt.Println(c)
+
 	dao.Mgr.AddUser(&user)
 	response.Success("添加成功", user, c)
 }
@@ -77,11 +77,17 @@ func Load(c *gin.Context) {
 }
 
 func EditSave(c *gin.Context) {
-	fmt.Println(c)
+	var context models.Content
+	if err := c.ShouldBind(&context); err != nil {
+		response.Failed("参数错误", c)
+		return
+	}
+	dao.Mgr.SaveEdit(&context)
+	response.Success("保存成功", context, c)
 }
 
 func GetUserList(c *gin.Context) {
-	fmt.Printf("列表数据： % + v\n", c)
+	fmt.Printf("列表数u： % + v\n", c)
 	pagination := utils.GeneratePaginationFromRequest(c)
 	users := dao.Mgr.GetUserList(&pagination)
 	response.Success("查询成功", users, c)
