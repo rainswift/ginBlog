@@ -56,6 +56,30 @@ func AddUser2(name string) error {
 	//c.AddUser(&user)
 }
 
+func Load(c *gin.Context) {
+	var user models.BlogUser
+	if err := c.ShouldBind(&user); err != nil {
+		response.Failed("参数错误", c)
+		return
+	}
+	loadUser, isUser := dao.Mgr.GetLoadUser(user.Username)
+	if isUser {
+		response.Failed("用户名不存在", c)
+		return
+	}
+	if ComparePwd(loadUser.Password, user.Password) {
+		fmt.Println("登录成功")
+		response.Success("登录成功", user, c)
+	} else {
+		fmt.Println("密码错误")
+		response.Failed("密码错误", c)
+	}
+}
+
+func EditSave(c *gin.Context) {
+	fmt.Println(c)
+}
+
 // 生成密码
 func GenPwd(pwd string) ([]byte, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost) //加密处理

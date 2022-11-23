@@ -31,6 +31,8 @@ func Start() {
 
 	e.Use(mwCORS)
 	e.POST("/add", api.AddUser)
+	e.POST("/load", api.Load)
+	e.POST("/editSave", api.EditSave)
 
 	e.Run()
 }

@@ -12,6 +12,7 @@ import (
 type Manager interface {
 	AddUser(user *models.BlogUser)
 	GetByName(name string) bool
+	GetLoadUser(name string) (*models.BlogUser, bool)
 	Cs_text()
 }
 
@@ -62,6 +63,18 @@ func (mgr *manager) GetByName(name string) bool {
 	} else {
 		return true
 	}
+}
+func (mgr *manager) GetLoadUser(name string) (*models.BlogUser, bool) {
+	var u models.BlogUser
+	var flag bool
+	result := mgr.db.Where("username=?", name).First(&u)
+	affected := result.RowsAffected
+	if affected >= 1 {
+		flag = false
+	} else {
+		flag = true
+	}
+	return &u, flag
 }
 
 func (mgr *manager) Cs_text() {
