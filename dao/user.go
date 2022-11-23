@@ -14,6 +14,8 @@ type Manager interface {
 	GetByName(name string) bool
 	GetLoadUser(name string) (*models.BlogUser, bool)
 	Cs_text()
+	GetUserList(page *models.Pagination) []models.BlogUser
+	UserDelete(id int) models.BlogUser
 }
 
 type manager struct {
@@ -32,31 +34,16 @@ func init() {
 	db.AutoMigrate(&models.BlogUser{})
 }
 
-//func (mgr *manager) AddUser(user *models.BlogUser) {
-//	fmt.Printf("% + v\n", user)
-//	mgr.db.Create(user)
-//}
-
 // 创建用户
 func (mgr *manager) AddUser(user *models.BlogUser) {
 	mgr.db.Create(user)
 
 }
 
-// 根据用户名查询用户
+// 根据用户名查询用户是否存在
 func (mgr *manager) GetByName(name string) bool {
 	var user models.BlogUser
-
-	//mgr.db.Last(&user)
-	//result := mgr.db.Where("username = ?", "qq")
-	//affected := result.RowsAffected
-	//fmt.Printf("% + v\n",result)
-	//fmt.Println(affected)
-
 	result := mgr.db.Where("username = ?", name).First(&user, "username = ?", name)
-	//if err != nil {
-	//	return false
-	//}
 	affected := result.RowsAffected
 	if affected >= 1 {
 		return false
@@ -77,10 +64,22 @@ func (mgr *manager) GetLoadUser(name string) (*models.BlogUser, bool) {
 	return &u, flag
 }
 
-func (mgr *manager) Cs_text() {
-	var user models.BlogUser
-	result := mgr.db.Last(&user)
-	affected := result.RowsAffected
-	fmt.Printf("% + v\n", user.Username)
-	fmt.Println(affected)
+// 查找用户列表
+func (mgr *manager) GetUserList(page *models.Pagination) []models.BlogUser {
+	var users []models.BlogUser
+	offset := (page.Page - 1) * page.Limit
+	queryBuider := mgr.db.Limit(page.Limit).Offset(offset).Find(&users)
+	queryBuider.Model(&models.BlogUser{}).Where(
+		"username like ?  ",
+		"%"+page.Sort+"%",
+	).Find(&users)
+	//mgr.db.Scopes(paginate(categories, &pagination, mgr.db)).Find(&categories)
+	return users
+}
+
+// 用户删除
+func (mgr *manager) UserDelete(id int) models.BlogUser {
+	var users models.BlogUser
+	mgr.db.Delete(&models.BlogUser{}, id).Find(&users)
+	return users
 }

@@ -80,6 +80,46 @@ func EditSave(c *gin.Context) {
 	fmt.Println(c)
 }
 
+func GetUserList(c *gin.Context) {
+	fmt.Printf("列表数据： % + v\n", c)
+	pagination := utils.GeneratePaginationFromRequest(c)
+	users := dao.Mgr.GetUserList(&pagination)
+	response.Success("查询成功", users, c)
+}
+
+func UserDelect(c *gin.Context) {
+	pagination := utils.RequestId(c)
+	//bodyByts, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("删除数据： % + v\n", pagination)
+	id := c.DefaultPostForm("id", "0")
+	//id := c.PostForm("id")
+
+	fmt.Printf("删除id： % + v\n", id)
+	users := dao.Mgr.UserDelete(pagination)
+	response.Success("删除成功", users, c)
+}
+
+//登录
+func Login(c *gin.Context) {
+
+	var user models.BlogUser
+
+	if err := c.ShouldBind(&user); err != nil {
+		response.Failed("参数错误", c)
+		return
+	}
+
+	if err := AddUser2(user.Username); err != nil {
+		response.Failed("用户名已经存在", c)
+		return
+	}
+	b, _ := GenPwd(user.Password)
+	user.Password = string(b)
+
+	dao.Mgr.AddUser(&user)
+	response.Success("添加成功", user, c)
+}
+
 // 生成密码
 func GenPwd(pwd string) ([]byte, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost) //加密处理
