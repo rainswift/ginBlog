@@ -16,8 +16,13 @@ type Pagination struct {
 
 type Content struct {
 	gorm.Model
-	Content string `json:"content"`
-	Title   string `json:"title"`
-	ImgBg   string `json:"imgBg"`
-	Label   string `json:"label"`
+	Content   string `json:"content" binding:"required"`
+	Title     string `json:"title" binding:"required"`
+	ImgBg     string `json:"imgBg" binding:"required"`
+	Label     string `json:"label" binding:"required"`
+	Introduce string `json:"introduce" binding:"required"`
+}
+
+type GetId struct {
+	Id int `json:"id"`
 }

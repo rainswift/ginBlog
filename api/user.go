@@ -56,7 +56,7 @@ func AddUser2(name string) error {
 	//c.AddUser(&user)
 }
 
-func Load(c *gin.Context) {
+func Login(c *gin.Context) {
 	var user models.BlogUser
 	if err := c.ShouldBind(&user); err != nil {
 		response.Failed("参数错误", c)
@@ -85,6 +85,11 @@ func EditSave(c *gin.Context) {
 	dao.Mgr.SaveEdit(&context)
 	response.Success("保存成功", context, c)
 }
+func GetEditList(c *gin.Context) {
+	pagination := utils.GeneratePaginationFromRequest(c)
+	users := dao.Mgr.GetEditList(&pagination)
+	response.Success("查询成功", users, c)
+}
 
 func GetUserList(c *gin.Context) {
 	fmt.Printf("列表数u： % + v\n", c)
@@ -105,25 +110,20 @@ func UserDelect(c *gin.Context) {
 	response.Success("删除成功", users, c)
 }
 
-//登录
-func Login(c *gin.Context) {
-
-	var user models.BlogUser
-
-	if err := c.ShouldBind(&user); err != nil {
+func GetDeatils(c *gin.Context) {
+	//var user models.BlogUser
+	//if err := c.ShouldBind(&user); err != nil {
+	//	response.Failed("参数错误", c)
+	//	return
+	//}
+	var cid models.GetId
+	if err := c.ShouldBind(&cid); err != nil {
 		response.Failed("参数错误", c)
 		return
 	}
-
-	if err := AddUser2(user.Username); err != nil {
-		response.Failed("用户名已经存在", c)
-		return
-	}
-	b, _ := GenPwd(user.Password)
-	user.Password = string(b)
-
-	dao.Mgr.AddUser(&user)
-	response.Success("添加成功", user, c)
+	fmt.Printf("删除id： % + v\n", cid.Id)
+	users := dao.Mgr.GetEditDetails(cid.Id)
+	response.Success("查询成功", users, c)
 }
 
 // 生成密码

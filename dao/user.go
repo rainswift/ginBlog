@@ -15,6 +15,8 @@ type Manager interface {
 	GetUserList(page *models.Pagination) []models.BlogUser
 	UserDelete(id int) models.BlogUser
 	SaveEdit(c *models.Content)
+	GetEditList(page *models.Pagination) []models.Content
+	GetEditDetails(id int) models.Content
 }
 
 type manager struct {
@@ -86,4 +88,23 @@ func (mgr *manager) UserDelete(id int) models.BlogUser {
 	var users models.BlogUser
 	mgr.db.Delete(&models.BlogUser{}, id).Find(&users)
 	return users
+}
+
+// 查找文章列表
+func (mgr *manager) GetEditList(page *models.Pagination) []models.Content {
+	var content []models.Content
+	offset := (page.Page - 1) * page.Limit
+	queryBuider := mgr.db.Limit(page.Limit).Offset(offset).Find(&content)
+	queryBuider.Model(&models.BlogUser{}).Find(&content)
+	//mgr.db.Scopes(paginate(categories, &pagination, mgr.db)).Find(&categories)
+	return content
+}
+
+// 查找文章详情
+func (mgr *manager) GetEditDetails(id int) models.Content {
+	var content models.Content
+	mgr.db.Where("id=?", id).First(&content)
+
+	//mgr.db.Scopes(paginate(categories, &pagination, mgr.db)).Find(&categories)
+	return content
 }
