@@ -87,8 +87,8 @@ func EditSave(c *gin.Context) {
 }
 func GetEditList(c *gin.Context) {
 	pagination := utils.GeneratePaginationFromRequest(c)
-	users := dao.Mgr.GetEditList(&pagination)
-	response.Success("查询成功", users, c)
+	users, len := dao.Mgr.GetEditList(&pagination)
+	response.SuccessList("查询成功", users, len, c)
 }
 
 func GetUserList(c *gin.Context) {

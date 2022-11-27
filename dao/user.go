@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"fmt"
 	"ginBlog/models"
 	"log"
 
@@ -15,7 +16,7 @@ type Manager interface {
 	GetUserList(page *models.Pagination) []models.BlogUser
 	UserDelete(id int) models.BlogUser
 	SaveEdit(c *models.Content)
-	GetEditList(page *models.Pagination) []models.Content
+	GetEditList(page *models.Pagination) ([]models.Content, int64)
 	GetEditDetails(id int) models.Content
 }
 
@@ -91,13 +92,16 @@ func (mgr *manager) UserDelete(id int) models.BlogUser {
 }
 
 // 查找文章列表
-func (mgr *manager) GetEditList(page *models.Pagination) []models.Content {
+func (mgr *manager) GetEditList(page *models.Pagination) ([]models.Content, int64) {
 	var content []models.Content
+	len := mgr.db.Find(&content).RowsAffected
+	fmt.Print(len)
 	offset := (page.Page - 1) * page.Limit
 	queryBuider := mgr.db.Limit(page.Limit).Offset(offset).Find(&content)
 	queryBuider.Model(&models.BlogUser{}).Find(&content)
+
 	//mgr.db.Scopes(paginate(categories, &pagination, mgr.db)).Find(&categories)
-	return content
+	return content, len
 }
 
 // 查找文章详情
