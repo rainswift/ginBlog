@@ -26,3 +26,11 @@ type Content struct {
 type GetId struct {
 	Id int `json:"id"`
 }
+
+type UserInfo struct {
+	Name      string `json:"name"`
+	HeadImg   string `json:"headImg"`
+	Introduce string `json:"introduce"`
+	Github    string `json:"github"`
+	Qq        string `json:"qq"`
+}

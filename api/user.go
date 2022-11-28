@@ -85,6 +85,7 @@ func EditSave(c *gin.Context) {
 	dao.Mgr.SaveEdit(&context)
 	response.Success("保存成功", context, c)
 }
+
 func GetEditList(c *gin.Context) {
 	pagination := utils.GeneratePaginationFromRequest(c)
 	users, len := dao.Mgr.GetEditList(&pagination)
@@ -123,6 +124,22 @@ func GetDeatils(c *gin.Context) {
 	}
 	fmt.Printf("删除id： % + v\n", cid.Id)
 	users := dao.Mgr.GetEditDetails(cid.Id)
+	response.Success("查询成功", users, c)
+}
+
+// 个人信息保存
+func UserSave(c *gin.Context) {
+	var context models.UserInfo
+	if err := c.ShouldBind(&context); err != nil {
+		response.Failed("参数错误", c)
+		return
+	}
+	dao.Mgr.UserSave(&context)
+	response.Success("保存成功", context, c)
+}
+
+func GetUserInfo(c *gin.Context) {
+	users := dao.Mgr.GetUserInfo()
 	response.Success("查询成功", users, c)
 }
 

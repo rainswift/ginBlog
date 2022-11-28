@@ -18,6 +18,8 @@ type Manager interface {
 	SaveEdit(c *models.Content)
 	GetEditList(page *models.Pagination) ([]models.Content, int64)
 	GetEditDetails(id int) models.Content
+	UserSave(c *models.UserInfo)
+	GetUserInfo() models.UserInfo
 }
 
 type manager struct {
@@ -35,6 +37,7 @@ func init() {
 	Mgr = &manager{db: db}
 	db.AutoMigrate(&models.BlogUser{})
 	db.AutoMigrate(&models.Content{})
+	db.AutoMigrate(&models.UserInfo{})
 }
 
 // 创建用户
@@ -42,8 +45,13 @@ func (mgr *manager) AddUser(user *models.BlogUser) {
 	mgr.db.Create(user)
 }
 
-// 保持文章
+// 保存文章
 func (mgr *manager) SaveEdit(c *models.Content) {
+	mgr.db.Create(c)
+}
+
+// 保持个人信息
+func (mgr *manager) UserSave(c *models.UserInfo) {
 	mgr.db.Create(c)
 }
 
@@ -109,6 +117,14 @@ func (mgr *manager) GetEditDetails(id int) models.Content {
 	var content models.Content
 	mgr.db.Where("id=?", id).First(&content)
 
+	//mgr.db.Scopes(paginate(categories, &pagination, mgr.db)).Find(&categories)
+	return content
+}
+
+// 查找用户信息
+func (mgr *manager) GetUserInfo() models.UserInfo {
+	var content models.UserInfo
+	mgr.db.First(&content)
 	//mgr.db.Scopes(paginate(categories, &pagination, mgr.db)).Find(&categories)
 	return content
 }
