@@ -130,10 +130,16 @@ func GetDeatils(c *gin.Context) {
 // 个人信息保存
 func UserSave(c *gin.Context) {
 	var context models.UserInfo
+
+	//jwt.StandardClaims{
+	//	ExpiresAt: time.Now().Add(time.Hour * 2).Unix(), // 过期时间
+	//	Issuer:    "laoguo",                             // 签发人
+	//},
 	if err := c.ShouldBind(&context); err != nil {
 		response.Failed("参数错误", c)
 		return
 	}
+
 	dao.Mgr.UserSave(&context)
 	response.Success("保存成功", context, c)
 }
