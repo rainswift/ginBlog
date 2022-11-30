@@ -90,8 +90,7 @@ func EditSave(c *gin.Context) {
 
 func GetEditList(c *gin.Context) {
 	pagination := utils.GeneratePaginationFromRequest(c)
-	_, err := ParseToken(c)
-	if err == nil {
+	if _, err := ParseToken(c); err != nil {
 		return
 	}
 	users, len := dao.Mgr.GetEditList(&pagination)

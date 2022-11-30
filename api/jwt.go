@@ -33,7 +33,7 @@ func ParseToken(c *gin.Context) (*models.BlogUser, error) {
 	tokenString := c.GetHeader("Authorization")
 	if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
 		response.Failed("token过期", c)
-		return nil, nil
+		return nil, errors.New("invalid token1")
 	}
 	tokenString = tokenString[7:]
 	// 解析token
