@@ -67,9 +67,11 @@ func Login(c *gin.Context) {
 		response.Failed("用户名不存在", c)
 		return
 	}
+	token, _ := GenToken(user.Username, user.Password)
+	fmt.Printf(token)
 	if ComparePwd(loadUser.Password, user.Password) {
 		fmt.Println("登录成功")
-		response.Success("登录成功", user, c)
+		response.SuccessToken("登录成功", user, token, c)
 	} else {
 		fmt.Println("密码错误")
 		response.Failed("密码错误", c)
@@ -88,6 +90,10 @@ func EditSave(c *gin.Context) {
 
 func GetEditList(c *gin.Context) {
 	pagination := utils.GeneratePaginationFromRequest(c)
+	_, err := ParseToken(c)
+	if err == nil {
+		return
+	}
 	users, len := dao.Mgr.GetEditList(&pagination)
 	response.SuccessList("查询成功", users, len, c)
 }

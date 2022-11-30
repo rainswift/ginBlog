@@ -1,8 +1,12 @@
 package api
 
 import (
+	"errors"
 	"ginBlog/models"
+	response "ginBlog/responose"
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"strings"
 	"time"
 )
 
@@ -21,4 +25,27 @@ func GenToken(username string, password string) (string, error) {
 	// 使用指定的secret签名并获得完整的编码后的字符串token
 	// 注意这个地方一定要是字节切片不能是字符串
 	return token.SignedString([]byte("secret"))
+}
+
+var MySecret = []byte("secret")
+
+func ParseToken(c *gin.Context) (*models.BlogUser, error) {
+	tokenString := c.GetHeader("Authorization")
+	if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
+		response.Failed("token过期", c)
+		return nil, nil
+	}
+	tokenString = tokenString[7:]
+	// 解析token
+	token, err := jwt.ParseWithClaims(tokenString, &models.BlogUser{},
+		func(token *jwt.Token) (i interface{}, err error) {
+			return MySecret, nil
+		})
+	if err != nil {
+		return nil, err
+	}
+	if claims, ok := token.Claims.(*models.BlogUser); ok && token.Valid { // 校验token
+		return claims, nil
+	}
+	return nil, errors.New("invalid token")
 }
