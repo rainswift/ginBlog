@@ -79,6 +79,10 @@ func Login(c *gin.Context) {
 }
 
 func EditSave(c *gin.Context) {
+	if _, err := ParseToken(c); err != nil {
+		return
+	}
+
 	var context models.Content
 	if err := c.ShouldBind(&context); err != nil {
 		response.Failed("参数错误", c)
@@ -91,23 +95,29 @@ func EditSave(c *gin.Context) {
 func GetEditList(c *gin.Context) {
 	pagination := utils.GeneratePaginationFromRequest(c)
 	if _, err := ParseToken(c); err != nil {
+		fmt.Println(err)
 		return
 	}
 	users, len := dao.Mgr.GetEditList(&pagination)
-	response.SuccessList("查询成功", users, len, c)
+	response.SuccessList("查询成功5", users, len, c)
 }
 
 func GetUserList(c *gin.Context) {
-	fmt.Printf("列表数u： % + v\n", c)
+	if _, err := ParseToken(c); err != nil {
+		return
+	}
 	pagination := utils.GeneratePaginationFromRequest(c)
 	users := dao.Mgr.GetUserList(&pagination)
 	response.Success("查询成功", users, c)
 }
 
 func UserDelect(c *gin.Context) {
+	//没有完成
+	if _, err := ParseToken(c); err != nil {
+		return
+	}
+
 	pagination := utils.RequestId(c)
-	//bodyByts, _ := ioutil.ReadAll(c.Request.Body)
-	fmt.Printf("删除数据： % + v\n", pagination)
 	id := c.DefaultPostForm("id", "0")
 	//id := c.PostForm("id")
 
@@ -117,29 +127,26 @@ func UserDelect(c *gin.Context) {
 }
 
 func GetDeatils(c *gin.Context) {
-	//var user models.BlogUser
-	//if err := c.ShouldBind(&user); err != nil {
-	//	response.Failed("参数错误", c)
-	//	return
-	//}
+	if _, err := ParseToken(c); err != nil {
+		return
+	}
+
 	var cid models.GetId
 	if err := c.ShouldBind(&cid); err != nil {
 		response.Failed("参数错误", c)
 		return
 	}
-	fmt.Printf("删除id： % + v\n", cid.Id)
 	users := dao.Mgr.GetEditDetails(cid.Id)
 	response.Success("查询成功", users, c)
 }
 
 // 个人信息保存
 func UserSave(c *gin.Context) {
-	var context models.UserInfo
+	if _, err := ParseToken(c); err != nil {
+		return
+	}
 
-	//jwt.StandardClaims{
-	//	ExpiresAt: time.Now().Add(time.Hour * 2).Unix(), // 过期时间
-	//	Issuer:    "laoguo",                             // 签发人
-	//},
+	var context models.UserInfo
 	if err := c.ShouldBind(&context); err != nil {
 		response.Failed("参数错误", c)
 		return
@@ -150,6 +157,9 @@ func UserSave(c *gin.Context) {
 }
 
 func GetUserInfo(c *gin.Context) {
+	if _, err := ParseToken(c); err != nil {
+		return
+	}
 	users := dao.Mgr.GetUserInfo()
 	response.Success("查询成功", users, c)
 }

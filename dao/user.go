@@ -2,6 +2,7 @@ package dao
 
 import (
 	"fmt"
+	"ginBlog/config"
 	"ginBlog/models"
 	"log"
 
@@ -28,8 +29,14 @@ type manager struct {
 
 var Mgr Manager
 
+var AppConfig = &config.Configuration{}
+
 func init() {
-	dsn := "root:root@tcp(127.0.0.1:3306)/blog?charset=utf8mb4&parseTime=True&loc=Local"
+	cfgFile := "./config/config.yaml"
+	conf, err := config.GetAllConfigValues(cfgFile)
+	AppConfig = conf
+
+	dsn := AppConfig.DatabaseSettings.DatabaseURI
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to init db:", err)

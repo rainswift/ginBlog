@@ -32,7 +32,7 @@ var MySecret = []byte("secret")
 func ParseToken(c *gin.Context) (*models.BlogUser, error) {
 	tokenString := c.GetHeader("Authorization")
 	if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
-		response.Failed("token过期", c)
+		response.FailedToken("token过期", c)
 		return nil, errors.New("invalid token1")
 	}
 	tokenString = tokenString[7:]
@@ -42,10 +42,12 @@ func ParseToken(c *gin.Context) (*models.BlogUser, error) {
 			return MySecret, nil
 		})
 	if err != nil {
+		response.FailedToken("token过期", c)
 		return nil, err
 	}
 	if claims, ok := token.Claims.(*models.BlogUser); ok && token.Valid { // 校验token
 		return claims, nil
 	}
+	response.FailedToken("token过期", c)
 	return nil, errors.New("invalid token")
 }
