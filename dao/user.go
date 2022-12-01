@@ -20,7 +20,7 @@ type Manager interface {
 	GetEditList(page *models.Pagination) ([]models.Content, int64)
 	GetEditDetails(id int) models.Content
 	UserSave(c *models.UserInfo)
-	GetUserInfo() models.UserInfo
+	GetUserInfo(id string) models.UserInfo
 }
 
 type manager struct {
@@ -73,6 +73,7 @@ func (mgr *manager) GetByName(name string) bool {
 		return true
 	}
 }
+
 func (mgr *manager) GetLoadUser(name string) (*models.BlogUser, bool) {
 	var u models.BlogUser
 	var flag bool
@@ -128,10 +129,10 @@ func (mgr *manager) GetEditDetails(id int) models.Content {
 	return content
 }
 
-// 查找用户信息
-func (mgr *manager) GetUserInfo() models.UserInfo {
+// 查找用户资料信息
+func (mgr *manager) GetUserInfo(id string) models.UserInfo {
 	var content models.UserInfo
-	mgr.db.First(&content)
-	//mgr.db.Scopes(paginate(categories, &pagination, mgr.db)).Find(&categories)
+	//mgr.db.First(&content)
+	mgr.db.Where("user_id=?", id).First(&content)
 	return content
 }

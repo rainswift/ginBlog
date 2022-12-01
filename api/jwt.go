@@ -12,7 +12,7 @@ import (
 
 func GenToken(username string, password string) (string, error) {
 	// 创建一个我们自己的声明
-	c := models.BlogUser{
+	c := models.MyClaims{
 		username, // 自定义字段
 		password,
 		jwt.StandardClaims{

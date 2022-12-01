@@ -37,7 +37,7 @@ func AddUser(c *gin.Context) {
 func AddUser2(name string) error {
 
 	// 用户名存在
-	flag := dao.Mgr.GetByName(name)
+	_, flag := dao.Mgr.GetLoadUser(name)
 	fmt.Println(flag)
 	if flag {
 		return nil
@@ -71,7 +71,7 @@ func Login(c *gin.Context) {
 	fmt.Printf(token)
 	if ComparePwd(loadUser.Password, user.Password) {
 		fmt.Println("登录成功")
-		response.SuccessToken("登录成功", user, token, c)
+		response.SuccessToken("登录成功", loadUser, token, c)
 	} else {
 		fmt.Println("密码错误")
 		response.Failed("密码错误", c)
@@ -157,10 +157,12 @@ func UserSave(c *gin.Context) {
 }
 
 func GetUserInfo(c *gin.Context) {
+	id := c.Query("id")
+
 	if _, err := ParseToken(c); err != nil {
 		return
 	}
-	users := dao.Mgr.GetUserInfo()
+	users := dao.Mgr.GetUserInfo(id)
 	response.Success("查询成功", users, c)
 }
 

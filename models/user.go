@@ -6,6 +6,7 @@ import (
 )
 
 type BlogUser struct {
+	gorm.Model
 	Username string `json:"username"`
 	Password string `json:"password"`
 	jwt.StandardClaims
@@ -36,6 +37,7 @@ type GetId struct {
 }
 
 type UserInfo struct {
+	UserId    int    `json:"userId"`
 	Name      string `json:"name"`
 	HeadImg   string `json:"headImg"`
 	Introduce string `json:"introduce"`
