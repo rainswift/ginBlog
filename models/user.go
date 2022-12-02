@@ -25,6 +25,7 @@ type Pagination struct {
 
 type Content struct {
 	gorm.Model
+	UserId    int    `json:"userId"`
 	Content   string `json:"content" binding:"required"`
 	Title     string `json:"title" binding:"required"`
 	ImgBg     string `json:"imgBg" binding:"required"`

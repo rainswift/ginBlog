@@ -36,7 +36,7 @@ func Start() {
 	e.GET("/userList", api.GetUserList)
 	e.POST("/login", api.Login)
 	e.GET("/edit/list", api.GetEditList)
-	e.POST("/edit/deatils", api.GetDeatils)
+	e.GET("/edit/deatils", api.GetDeatils)
 	e.POST("/userSave", api.UserSave)
 	e.GET("/getUserInfo", api.GetUserInfo)
 	e.Run()

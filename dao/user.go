@@ -17,10 +17,10 @@ type Manager interface {
 	GetUserList(page *models.Pagination) []models.BlogUser
 	UserDelete(id int) models.BlogUser
 	SaveEdit(c *models.Content)
-	GetEditList(page *models.Pagination) ([]models.Content, int64)
-	GetEditDetails(id int) models.Content
+	GetEditList(page *models.Pagination, userId int) ([]models.Content, int64)
+	GetEditDetails(id string, userId int) models.Content
 	UserSave(c *models.UserInfo)
-	GetUserInfo(id string) models.UserInfo
+	GetUserInfo(id int) models.UserInfo
 }
 
 type manager struct {
@@ -59,13 +59,30 @@ func (mgr *manager) SaveEdit(c *models.Content) {
 
 // 保持个人信息
 func (mgr *manager) UserSave(c *models.UserInfo) {
-	mgr.db.Create(c)
+	var context = c
+	result := mgr.db.Where("user_id = ?", c.UserId).First(c)
+	affected := result.RowsAffected
+	if affected >= 1 {
+		fmt.Println(context)
+		mgr.db.Model(&c).Where("user_id = ?", c.UserId).Take(context)
+	} else {
+		mgr.db.Create(c)
+	}
+
 }
 
-// 根据用户名查询用户是否存在
+//// 更新个人信息
+//func (mgr *manager) UserUp(c *models.UserInfo,userId int) {
+//	var user models.UserInfo
+//	// Select 所有字段（查询包括零值字段的所有字段）
+//	mgr.db.Model(&user).Where("user_id = ?", userId).Take(&c)
+//
+//}
+
+// 根据用户id查询用户信息是否存在
 func (mgr *manager) GetByName(name string) bool {
-	var user models.BlogUser
-	result := mgr.db.Where("username = ?", name).First(&user, "username = ?", name)
+	var user models.UserInfo
+	result := mgr.db.Where("user_id = ?", name).First(&user, "username = ?", name)
 	affected := result.RowsAffected
 	if affected >= 1 {
 		return false
@@ -74,6 +91,7 @@ func (mgr *manager) GetByName(name string) bool {
 	}
 }
 
+// 根据用户名查询用户是否存在
 func (mgr *manager) GetLoadUser(name string) (*models.BlogUser, bool) {
 	var u models.BlogUser
 	var flag bool
@@ -108,12 +126,12 @@ func (mgr *manager) UserDelete(id int) models.BlogUser {
 }
 
 // 查找文章列表
-func (mgr *manager) GetEditList(page *models.Pagination) ([]models.Content, int64) {
+func (mgr *manager) GetEditList(page *models.Pagination, userId int) ([]models.Content, int64) {
 	var content []models.Content
-	len := mgr.db.Find(&content).RowsAffected
+	len := mgr.db.Where("user_id = ?", userId).Find(&content).RowsAffected
 	fmt.Print(len)
 	offset := (page.Page - 1) * page.Limit
-	queryBuider := mgr.db.Limit(page.Limit).Offset(offset).Find(&content)
+	queryBuider := mgr.db.Where("user_id = ?", userId).Limit(page.Limit).Offset(offset).Find(&content)
 	queryBuider.Model(&models.BlogUser{}).Find(&content)
 
 	//mgr.db.Scopes(paginate(categories, &pagination, mgr.db)).Find(&categories)
@@ -121,16 +139,16 @@ func (mgr *manager) GetEditList(page *models.Pagination) ([]models.Content, int6
 }
 
 // 查找文章详情
-func (mgr *manager) GetEditDetails(id int) models.Content {
+func (mgr *manager) GetEditDetails(id string, userId int) models.Content {
 	var content models.Content
-	mgr.db.Where("id=?", id).First(&content)
+	mgr.db.Where("id = ? AND user_id >= ?", id, userId).First(&content)
 
 	//mgr.db.Scopes(paginate(categories, &pagination, mgr.db)).Find(&categories)
 	return content
 }
 
 // 查找用户资料信息
-func (mgr *manager) GetUserInfo(id string) models.UserInfo {
+func (mgr *manager) GetUserInfo(id int) models.UserInfo {
 	var content models.UserInfo
 	//mgr.db.First(&content)
 	mgr.db.Where("user_id=?", id).First(&content)

@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"ginBlog/dao"
 	"ginBlog/models"
 	response "ginBlog/responose"
 	jwt "github.com/dgrijalva/jwt-go"
@@ -46,7 +47,8 @@ func ParseToken(c *gin.Context) (*models.BlogUser, error) {
 		return nil, err
 	}
 	if claims, ok := token.Claims.(*models.BlogUser); ok && token.Valid { // 校验token
-		return claims, nil
+		user, _ := dao.Mgr.GetLoadUser(claims.Username)
+		return user, nil
 	}
 	response.FailedToken("token过期", c)
 	return nil, errors.New("invalid token")

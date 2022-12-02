@@ -79,11 +79,13 @@ func Login(c *gin.Context) {
 }
 
 func EditSave(c *gin.Context) {
-	if _, err := ParseToken(c); err != nil {
+
+	user, err := ParseToken(c)
+	if err != nil {
 		return
 	}
-
 	var context models.Content
+	context.UserId = int(user.ID)
 	if err := c.ShouldBind(&context); err != nil {
 		response.Failed("参数错误", c)
 		return
@@ -93,13 +95,18 @@ func EditSave(c *gin.Context) {
 }
 
 func GetEditList(c *gin.Context) {
+	user, err := ParseToken(c)
+	if err != nil {
+		return
+	}
+	UserId := user.ID
 	pagination := utils.GeneratePaginationFromRequest(c)
 	if _, err := ParseToken(c); err != nil {
 		fmt.Println(err)
 		return
 	}
-	users, len := dao.Mgr.GetEditList(&pagination)
-	response.SuccessList("查询成功5", users, len, c)
+	users, len := dao.Mgr.GetEditList(&pagination, int(UserId))
+	response.SuccessList("查询成功", users, len, c)
 }
 
 func GetUserList(c *gin.Context) {
@@ -127,42 +134,45 @@ func UserDelect(c *gin.Context) {
 }
 
 func GetDeatils(c *gin.Context) {
-	if _, err := ParseToken(c); err != nil {
+	user, err := ParseToken(c)
+	if err != nil {
 		return
 	}
-
-	var cid models.GetId
-	if err := c.ShouldBind(&cid); err != nil {
-		response.Failed("参数错误", c)
-		return
-	}
-	users := dao.Mgr.GetEditDetails(cid.Id)
+	UserId := user.ID
+	id := c.Query("id")
+	//var cid models.GetId
+	//if err := c.ShouldBind(&cid); err != nil {
+	//	response.Failed("参数错误", c)
+	//	return
+	//}
+	users := dao.Mgr.GetEditDetails(id, int(UserId))
 	response.Success("查询成功", users, c)
 }
 
 // 个人信息保存
 func UserSave(c *gin.Context) {
-	if _, err := ParseToken(c); err != nil {
-		return
-	}
-
+	// user, err := ParseToken(c)
+	// if err != nil {
+	//	return
+	//}
 	var context models.UserInfo
+	context.UserId = 14
 	if err := c.ShouldBind(&context); err != nil {
 		response.Failed("参数错误", c)
 		return
 	}
-
+	fmt.Println(context)
 	dao.Mgr.UserSave(&context)
 	response.Success("保存成功", context, c)
 }
 
 func GetUserInfo(c *gin.Context) {
-	id := c.Query("id")
-
-	if _, err := ParseToken(c); err != nil {
+	//id := c.Query("id")
+	user, err := ParseToken(c)
+	if err != nil {
 		return
 	}
-	users := dao.Mgr.GetUserInfo(id)
+	users := dao.Mgr.GetUserInfo(int(user.ID))
 	response.Success("查询成功", users, c)
 }
 
