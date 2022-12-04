@@ -16,7 +16,7 @@ type Manager interface {
 	GetLoadUser(name string) (*models.BlogUser, bool)
 	GetUserList(page *models.Pagination) []models.BlogUser
 	UserDelete(id int) models.BlogUser
-	SaveEdit(c *models.Content)
+	SaveEdit(c *models.Content, id string)
 	GetEditList(page *models.Pagination, userId int) ([]models.Content, int64)
 	GetEditDetails(id string, userId int) models.Content
 	UserSave(c *models.UserInfo)
@@ -53,31 +53,17 @@ func (mgr *manager) AddUser(user *models.BlogUser) {
 }
 
 // 保存文章
-func (mgr *manager) SaveEdit(c *models.Content) {
-	mgr.db.Create(c)
+func (mgr *manager) SaveEdit(c *models.Content, id string) {
+	fmt.Println(c.ID)
+	mgr.db.Model(c).Where("id = ?", c.ID).Save(c)
 }
 
 // 保持个人信息
 func (mgr *manager) UserSave(c *models.UserInfo) {
-	var context = c
-	result := mgr.db.Where("user_id = ?", c.UserId).First(c)
-	affected := result.RowsAffected
-	if affected >= 1 {
-		fmt.Println(context)
-		mgr.db.Model(&c).Where("user_id = ?", c.UserId).Take(context)
-	} else {
-		mgr.db.Create(c)
-	}
+	context := c
+	mgr.db.Model(c).Where("user_id = ?", c.UserId).Save(context)
 
 }
-
-//// 更新个人信息
-//func (mgr *manager) UserUp(c *models.UserInfo,userId int) {
-//	var user models.UserInfo
-//	// Select 所有字段（查询包括零值字段的所有字段）
-//	mgr.db.Model(&user).Where("user_id = ?", userId).Take(&c)
-//
-//}
 
 // 根据用户id查询用户信息是否存在
 func (mgr *manager) GetByName(name string) bool {

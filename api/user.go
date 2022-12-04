@@ -90,7 +90,9 @@ func EditSave(c *gin.Context) {
 		response.Failed("参数错误", c)
 		return
 	}
-	dao.Mgr.SaveEdit(&context)
+	id := context.ID
+	fmt.Println(context.ID)
+	dao.Mgr.SaveEdit(&context, string(id))
 	response.Success("保存成功", context, c)
 }
 
@@ -151,17 +153,16 @@ func GetDeatils(c *gin.Context) {
 
 // 个人信息保存
 func UserSave(c *gin.Context) {
-	// user, err := ParseToken(c)
-	// if err != nil {
-	//	return
-	//}
+	user, err := ParseToken(c)
+	if err != nil {
+		return
+	}
 	var context models.UserInfo
-	context.UserId = 14
+	context.UserId = int(user.ID)
 	if err := c.ShouldBind(&context); err != nil {
 		response.Failed("参数错误", c)
 		return
 	}
-	fmt.Println(context)
 	dao.Mgr.UserSave(&context)
 	response.Success("保存成功", context, c)
 }
