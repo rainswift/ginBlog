@@ -134,6 +134,17 @@ func UserDelect(c *gin.Context) {
 	users := dao.Mgr.UserDelete(pagination)
 	response.Success("删除成功", users, c)
 }
+func EditDelect(c *gin.Context) {
+	name := c.PostForm("name")
+	id := c.PostForm("id")
+	fmt.Println(id, name)
+	var cid models.GetId
+	if err := c.ShouldBind(&cid); err != nil {
+		response.Failed("参数错误", c)
+		return
+	}
+	fmt.Println(cid)
+}
 
 func GetDeatils(c *gin.Context) {
 	user, err := ParseToken(c)

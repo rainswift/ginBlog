@@ -34,7 +34,7 @@ type Content struct {
 }
 
 type GetId struct {
-	Id int `json:"id"`
+	Id int `json:"id" form:"id" `
 }
 
 type UserInfo struct {
