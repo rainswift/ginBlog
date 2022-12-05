@@ -135,6 +135,7 @@ func UserDelect(c *gin.Context) {
 	response.Success("删除成功", users, c)
 }
 func EditDelect(c *gin.Context) {
+	c.ShouldBindJSON()
 	name := c.PostForm("name")
 	id := c.PostForm("id")
 	fmt.Println(id, name)
