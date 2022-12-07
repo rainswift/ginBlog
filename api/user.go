@@ -8,6 +8,7 @@ import (
 	"ginBlog/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"strings"
 )
 
 type Service struct {
@@ -135,16 +136,16 @@ func UserDelect(c *gin.Context) {
 	response.Success("删除成功", users, c)
 }
 func EditDelect(c *gin.Context) {
-	c.ShouldBindJSON()
-	name := c.PostForm("name")
-	id := c.PostForm("id")
-	fmt.Println(id, name)
-	var cid models.GetId
-	if err := c.ShouldBind(&cid); err != nil {
-		response.Failed("参数错误", c)
+	user, err := ParseToken(c)
+	if err != nil {
 		return
 	}
-	fmt.Println(cid)
+	UserId := user.ID
+	fmt.Println(c.PostForm("id"))
+	fmt.Println()
+	cid := strings.Split(c.PostForm("id"), ",")
+	users := dao.Mgr.EditDelete(cid, int(UserId))
+	response.Success("删除成功", users, c)
 }
 
 func GetDeatils(c *gin.Context) {

@@ -19,6 +19,7 @@ type Manager interface {
 	SaveEdit(c *models.Content, id string)
 	GetEditList(page *models.Pagination, userId int) ([]models.Content, int64)
 	GetEditDetails(id string, userId int) models.Content
+	EditDelete(id []string, userId int) models.Content
 	UserSave(c *models.UserInfo)
 	GetUserInfo(id int) models.UserInfo
 }
@@ -109,6 +110,18 @@ func (mgr *manager) UserDelete(id int) models.BlogUser {
 	var users models.BlogUser
 	mgr.db.Delete(&models.BlogUser{}, id).Find(&users)
 	return users
+}
+func (mgr *manager) EditDelete(id []string, userId int) models.Content {
+	fmt.Println(id, userId)
+	var content models.Content
+	mgr.db.Where("id IN ? AND user_id = ?", id, userId).Delete(&content)
+
+	//mgr.db.Scopes(paginate(categories, &pagination, mgr.db)).Find(&categories)
+	return content
+
+	//var users models.Content
+	//mgr.db.Delete(&models.Content{}, id).Find(&users)
+	//return users
 }
 
 // 查找文章列表
