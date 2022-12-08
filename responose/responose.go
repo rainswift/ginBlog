@@ -35,9 +35,9 @@ func SuccessToken(message string, data interface{}, token string, c *gin.Context
 
 // Failed 请求失败返回
 func Failed(message string, c *gin.Context) {
-	c.JSON(http.StatusOK, Response{400, message, 0})
+	c.JSON(400, Response{400, message, 0})
 }
 
 func FailedToken(message string, c *gin.Context) {
-	c.JSON(http.StatusOK, Response{403, message, 0})
+	c.JSON(403, Response{403, message, 0})
 }

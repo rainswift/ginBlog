@@ -39,7 +39,6 @@ func AddUser2(name string) error {
 
 	// 用户名存在
 	_, flag := dao.Mgr.GetLoadUser(name)
-	fmt.Println(flag)
 	if flag {
 		return nil
 	} else {
@@ -69,7 +68,6 @@ func Login(c *gin.Context) {
 		return
 	}
 	token, _ := GenToken(user.Username, user.Password)
-	fmt.Printf(token)
 	if ComparePwd(loadUser.Password, user.Password) {
 		fmt.Println("登录成功")
 		response.SuccessToken("登录成功", loadUser, token, c)
@@ -92,7 +90,6 @@ func EditSave(c *gin.Context) {
 		return
 	}
 	id := context.ID
-	fmt.Println(context.ID)
 	dao.Mgr.SaveEdit(&context, string(id))
 	response.Success("保存成功", context, c)
 }
@@ -128,10 +125,9 @@ func UserDelect(c *gin.Context) {
 	}
 
 	pagination := utils.RequestId(c)
-	id := c.DefaultPostForm("id", "0")
+	//id := c.DefaultPostForm("id", "0")
 	//id := c.PostForm("id")
 
-	fmt.Printf("删除id： % + v\n", id)
 	users := dao.Mgr.UserDelete(pagination)
 	response.Success("删除成功", users, c)
 }
@@ -141,8 +137,6 @@ func EditDelect(c *gin.Context) {
 		return
 	}
 	UserId := user.ID
-	fmt.Println(c.PostForm("id"))
-	fmt.Println()
 	cid := strings.Split(c.PostForm("id"), ",")
 	users := dao.Mgr.EditDelete(cid, int(UserId))
 	response.Success("删除成功", users, c)
