@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"ginBlog/config"
 	"ginBlog/models"
-	"log"
-
+	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"log"
 )
 
 type Manager interface {
@@ -30,14 +30,11 @@ type manager struct {
 
 var Mgr Manager
 
-var AppConfig = &config.Configuration{}
-
 func init() {
-	cfgFile := "./config/config.yaml"
-	conf, err := config.GetAllConfigValues(cfgFile)
-	AppConfig = conf
-
-	dsn := AppConfig.DatabaseSettings.DatabaseURI
+	config.InitConfig()
+	dsn := viper.GetString("datasource.DatabaseURI")
+	fmt.Println(1111)
+	fmt.Println(viper.GetString("datasource.DatabaseURI"))
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to init db:", err)
@@ -82,9 +79,8 @@ func (mgr *manager) GetByName(name string) bool {
 func (mgr *manager) GetLoadUser(name string) (*models.BlogUser, bool) {
 	var u models.BlogUser
 	var flag bool
-	result := mgr.db.Where("username=?", name).First(&u)
-	affected := result.RowsAffected
-	if affected >= 1 {
+	mgr.db.Where("username=?", name).First(&u)
+	if u.ID != 0 {
 		flag = false
 	} else {
 		flag = true

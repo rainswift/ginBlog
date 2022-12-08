@@ -1,0 +1,7 @@
+server:
+  port: 1016
+datasource:
+  DatabaseURI: "root:root@tcp(127.0.0.1:3306)/blog?charset=utf8mb4&parseTime=True&loc=Local"
+  DatabaseName: blog
+  Username: root
+  Password: root
