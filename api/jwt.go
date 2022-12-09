@@ -7,6 +7,7 @@ import (
 	response "ginBlog/responose"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/mitchellh/mapstructure"
 	"strings"
 	"time"
 )
@@ -52,4 +53,12 @@ func ParseToken(c *gin.Context) (*models.BlogUser, error) {
 	}
 	response.FailedToken("token过期", c)
 	return nil, errors.New("invalid token")
+}
+
+func getUser(c *gin.Context) *models.BlogUser {
+	var BlogUser models.BlogUser
+	user, _ := c.Get("user")
+	mapstructure.Decode(user, &BlogUser)
+	//UserId := BlogUser.ID
+	return &BlogUser
 }

@@ -78,11 +78,8 @@ func Login(c *gin.Context) {
 }
 
 func EditSave(c *gin.Context) {
+	user := getUser(c)
 
-	user, err := ParseToken(c)
-	if err != nil {
-		return
-	}
 	var context models.Content
 	context.UserId = int(user.ID)
 	if err := c.ShouldBind(&context); err != nil {
@@ -95,17 +92,14 @@ func EditSave(c *gin.Context) {
 }
 
 func GetEditList(c *gin.Context) {
-	user, err := ParseToken(c)
-	if err != nil {
-		return
-	}
-	UserId := user.ID
+	user := getUser(c)
+
 	pagination := utils.GeneratePaginationFromRequest(c)
 	if _, err := ParseToken(c); err != nil {
 		fmt.Println(err)
 		return
 	}
-	users, len := dao.Mgr.GetEditList(&pagination, int(UserId))
+	users, len := dao.Mgr.GetEditList(&pagination, int(user.ID))
 	response.SuccessList("查询成功", users, len, c)
 }
 
@@ -132,10 +126,7 @@ func UserDelect(c *gin.Context) {
 	response.Success("删除成功", users, c)
 }
 func EditDelect(c *gin.Context) {
-	user, err := ParseToken(c)
-	if err != nil {
-		return
-	}
+	user := getUser(c)
 	UserId := user.ID
 	cid := strings.Split(c.PostForm("id"), ",")
 	users := dao.Mgr.EditDelete(cid, int(UserId))
@@ -143,10 +134,7 @@ func EditDelect(c *gin.Context) {
 }
 
 func GetDeatils(c *gin.Context) {
-	user, err := ParseToken(c)
-	if err != nil {
-		return
-	}
+	user := getUser(c)
 	UserId := user.ID
 	id := c.Query("id")
 	//var cid models.GetId
@@ -160,10 +148,7 @@ func GetDeatils(c *gin.Context) {
 
 // 个人信息保存
 func UserSave(c *gin.Context) {
-	user, err := ParseToken(c)
-	if err != nil {
-		return
-	}
+	user := getUser(c)
 	var context models.UserInfo
 	context.UserId = int(user.ID)
 	if err := c.ShouldBind(&context); err != nil {
@@ -176,10 +161,7 @@ func UserSave(c *gin.Context) {
 
 func GetUserInfo(c *gin.Context) {
 	//id := c.Query("id")
-	user, err := ParseToken(c)
-	if err != nil {
-		return
-	}
+	user := getUser(c)
 	users := dao.Mgr.GetUserInfo(int(user.ID))
 	response.Success("查询成功", users, c)
 }
