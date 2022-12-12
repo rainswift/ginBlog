@@ -5,8 +5,15 @@ import (
 	"gorm.io/gorm"
 )
 
+type SetTime struct {
+	//ID        uint `gorm:"primarykey"`
+	createda_at Time
+	updated_at  Time
+	//DeletedAt gorm.DeletedAt `gorm:"index"`
+}
 type BlogUser struct {
 	gorm.Model
+	SetTime
 	Username string `json:"username"`
 	Password string `json:"password"`
 	jwt.StandardClaims

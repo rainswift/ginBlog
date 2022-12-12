@@ -53,7 +53,12 @@ func (mgr *manager) AddUser(user *models.BlogUser) {
 // 保存文章
 func (mgr *manager) SaveEdit(c *models.Content, id string) {
 	fmt.Println(c.ID)
-	mgr.db.Model(c).Where("id = ?", c.ID).Save(c)
+	if c.ID == 0 {
+		mgr.db.Create(c)
+	} else {
+		mgr.db.Model(c).Where("id = ?", c.ID).Save(c)
+	}
+
 }
 
 // 保持个人信息
